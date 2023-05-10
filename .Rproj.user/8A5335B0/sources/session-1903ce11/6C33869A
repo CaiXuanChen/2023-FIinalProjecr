@@ -1,25 +1,24 @@
 {
-    "id": "BA7F3905",
-    "path": null,
-    "project_path": null,
+    "id": "6C33869A",
+    "path": "C:/Users/caisyuan/OneDrive/桌面/2023-FIinalProjecr/final/R/helpers1.R",
+    "project_path": "final/R/helpers1.R",
     "type": "r_source",
     "hash": "0",
     "contents": "",
     "dirty": false,
-    "created": 1683704186761.0,
+    "created": 1683706238811.0,
     "source_on_save": false,
-    "relative_order": 1,
+    "relative_order": 4,
     "properties": {
-        "tempName": "Untitled1",
         "source_window_id": "",
         "Source": "Source"
     },
     "folds": "",
-    "lastKnownWriteTime": 7453005893743305061,
-    "encoding": "",
+    "lastKnownWriteTime": 1683706238,
+    "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1683704186761,
+    "last_content_update": 1683706238,
     "read_only": false,
     "read_only_alternatives": []
 }
