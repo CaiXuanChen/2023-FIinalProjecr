@@ -3,9 +3,9 @@
     "path": "C:/Users/caisyuan/OneDrive/桌面/2023-FIinalProjecr/final/analysis.Rmd",
     "project_path": "final/analysis.Rmd",
     "type": "r_markdown",
-    "hash": "0",
+    "hash": "58286859",
     "contents": "",
-    "dirty": true,
+    "dirty": false,
     "created": 1683705024729.0,
     "source_on_save": false,
     "relative_order": 2,
@@ -18,14 +18,14 @@
         "rmdVisualCollapsedChunks": "",
         "cursorPosition": "0,0",
         "scrollLine": "0",
-        "rmdVisualModeLocation": "26:0"
+        "rmdVisualModeLocation": "2:0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1683705024,
+    "lastKnownWriteTime": 1683709949,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1683705932819,
+    "last_content_update": 1683709949820,
     "read_only": false,
     "read_only_alternatives": []
 }
