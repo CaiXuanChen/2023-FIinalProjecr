@@ -3,7 +3,7 @@ library(readxl)
 library(tidyr)
 library(tidyselect)
 # import helper functions
-source("R/helpers.R") 
+source("R/helpers1.R") 
 
 #資料匯入
 dataForAll <- list()
@@ -11,48 +11,45 @@ dataForAll <- list()
 ### 各區
 
 dataForAll$各類別<- read.csv(
-  "C:/Users/caisyuan/OneDrive/桌面/2023-FIinalProjecr/final/R/臺南市各區各類別之診所、醫院.csv",col.names = c("欄位1", "欄位2", "欄位3" ))
+  "C:/Users/caisyuan/OneDrive/桌面/2023-FIinalProjecr/final/R/臺南市各區各類別之診所、醫院.csv")
+dataForAll$各類別<- dataForAll$各類別[, -c(2,4)]
 
 #### correct columnames
 
 correctDFColumnNames(df=dataForAll$各類別) ->
-  dataForAll$municipalityMayor
+  dataForAll$各類別
 correctDFColumnNames(dataForAll$countyMayor) ->
   dataForAll$countyMayor
 
 ### 藥局
 
 dataForAll$藥局<- read.csv(
-  "C:/Users/caisyuan/OneDrive/桌面/2023-FIinalProjecr/final/R/臺南市健保特約藥局.csv",col.names = c("欄位1", "欄位2", "欄位3" ))",col.names = c("欄位1", "欄位2", "欄位3" ))
-
-dataForAll$municipalityCouncillors <-  read_excel(
-  "data/直轄市議員選舉當選人資歷統計表.xls", sheet = 2, col_names = T, skip = 2)
-dataForAll$countyCouncillors <- read_excel(
-  "data/縣(市)議員選舉當選人資歷統計表.xls", sheet = 2, col_names = T, skip=2)
+  "C:/Users/caisyuan/OneDrive/桌面/2023-FIinalProjecr/final/R/臺南市健保特約藥局.csv")
+dataForAll$藥局<- dataForAll$藥局[, -c(3)]
+dataForAll$診所<- read.csv(
+  "C:/Users/caisyuan/OneDrive/桌面/2023-FIinalProjecr/final/R/臺南市醫療院所.csv")
+dataForAll$診所<- dataForAll$診所[, -c(3)]
 
 
 dataForAll$藥局 |> 
   dplyr::glimpse()
 
 saveRDS(dataForAll, file="dataForAll.Rds")
-
 dataForAll=readRDS("dataForAll.Rds")
-```
 
 # 拉長
 
-
-```{r}
 dataForAll$municipalityMayor |>
   dplyr::glimpse()
-```
 
-```{r}
 dataForAllLong <- list()
 dataForAll$municipalityMayor |> tidyr::pivot_longer(
   cols = c(2:9), names_to ="黨派", values_to ="得票數"
 ) -> dataForAllLong$municipalityMayor
+
 # dataForAllLong$municipalityMayor |> View()
+
+
 dataForAll$countyMayor |> tidyr::pivot_longer(
   cols = c(2:8), names_to ="黨派", values_to ="得票數"
 ) -> dataForAllLong$countyMayor
@@ -62,77 +59,90 @@ dataForAll$municipalityCouncillors |> tidyr::pivot_longer(
 dataForAll$countyCouncillors |> tidyr::pivot_longer(
   cols = c(2:12), names_to ="黨派", values_to ="席次"
 ) -> dataForAllLong$countyCouncillors
-```
-
-```{r}
-View(dataForAllLong$municipalityMayor)
-View(dataForAllLong$countyMayor)
-View(dataForAllLong$municipalityCouncillors)
-View(dataForAllLong$countyCouncillors)
-```
 
 
-## 台北市哪一黨勝出
+View(dataForAllLong$藥局)
+View(dataForAllLong$診所)
+View(dataForAllLong$醫院)
+
+
+
+
+## 台南市各區域哪類別診所最多
 
 ### dplyr::filter
 
-```{r}
 dataForAllLong$municipalityMayor |> dplyr::glimpse()
-```
-```{r}
+
+address_df <- data.frame()
+address_df$address <- c("地址1", "地址2", "地址3", ..., "地址600")  # 替換 "地址1", "地址2", "地址3", ..., "地址600" 為實際的地址資料，需按照相應的順序
+
+# 假設你有一個地址的資料框 data.frame，其中包含一個名為 "地址" 的欄位
+addressData <- data.frame(
+  地址 = c("", "", "", "")
+)
+
+# 使用正則表達式從地址中提取區名稱
+districts <- sub(".*([市縣].+[區鄉鎮市區]).*", "\\1", addressData$地址)
+
+# 計算每個區的資料筆數
+districtCounts <- table(districts)
+
+# 輸出結果
+print(districtCounts)
+
+
+
+
 targetDF = dataForAllLong$municipalityMayor
 # filter 台北市
 targetDF |>
   dplyr::filter(
     行政區別 == "臺北市" # logical expression
   )  -> dfTaipei
-```
+
 
 ### dplyr::summarise
 
 #### summarise 等號右邊
 
-```{r}
+
 dfTaipei$黨派
 dfTaipei$得票數
 {
   pos<-which.max(dfTaipei$得票數)
   dfTaipei$黨派[[pos]]
 }
-```
 
-```{r}
 party = dfTaipei$黨派
 voteShare = dfTaipei$得票數
 {
   pos<-which.max(voteShare)
   party[[pos]]
 }
-```
 
-```{r}
+
 getWinningParty = function(party, voteShare){
   pos<-which.max(voteShare)
   return(party[[pos]])
 }
 
 getWinningParty(dfTaipei$黨派, dfTaipei$得票數)
-```
 
-```{r}
+
 dfTaipei |>
   dplyr::summarise(
     winningParty = getWinningParty(黨派,得票數)
   )
-```
+
 
 ## 各行政區市長黨派
 
 ### dplyr::group_by
 
-* replace `filter` with `group_by`
+## replace `filter` with `group_by`
 
-```{r}
+
 dataForAllLong$municipalityMayor |>
   # dplyr::filter(
   #   行政區別 == "臺北市" # logical expression
@@ -147,20 +157,19 @@ dataForAllLong$municipalityMayor |>
     }
     # getWinningParty(黨派,得票數)
   ) -> dataForAll$winningParty$municipalMayor
-```
 
-```{r}
+
+
 getWinningParty = function(party, voteShare){
   pos<-which.max(voteShare)
   return(party[[pos]])
 }
-```
 
-```{r}
+
 dataForAllLong$countyMayor |> View()
-```
 
-```{r}
+
+
 dataForAllLong$countyMayor |>
   dplyr::group_by(
     行政區別
@@ -169,22 +178,17 @@ dataForAllLong$countyMayor |>
     winningParty = 
       getWinningParty(黨派,得票數)
   ) -> dataForAll$winningParty$countyMayor
-```
 
-```{r}
 saveRDS(dataForAll, "dataForAll.Rds")
-```
+
 
 
 
 
 ## 議會
 
-```{r}
 dataForAllLong$municipalityCouncillors |> View()
-```
 
-```{r}
 dataForAllLong$municipalityCouncillors |>
   dplyr::group_by(
     行政區別
@@ -196,10 +200,7 @@ dataForAllLong$municipalityCouncillors |>
       max(席次, na.rm=T)
     }
   ) -> dataForAll$winningParty$municipalityCouncillors
-```
 
-
-```{r}
 dataForAllLong$countyCouncillors |>
   dplyr::group_by(
     行政區別
@@ -212,17 +213,16 @@ dataForAllLong$countyCouncillors |>
     }
   ) -> dataForAll$winningParty$countyCouncillors
 View(dataForAll$winningParty$countyCouncillors)
-```
+
 
 ## 合併
 
-```{r}
 dataForAll$winningParty$municipalMayor |> View()
-```
+
 
 ### dplyr::xxx_join
 
-```{r}
+
 dataForAll$winningParty$municipalMayor |>
   dplyr::left_join(
     dataForAll$winningParty$municipalityCouncillors,
@@ -231,9 +231,7 @@ dataForAll$winningParty$municipalMayor |>
   dataForAll$result$municipal
 
 View(dataForAll$result$municipal)
-```
 
-```{r}
 dataForAll$winningParty$countyMayor |>
   dplyr::left_join(
     dataForAll$winningParty$countyCouncillors,
@@ -242,29 +240,22 @@ dataForAll$winningParty$countyMayor |>
   dataForAll$result$county
 
 View(dataForAll$result$county)
-```
 
-```{r}
 dataForAll$countyCouncillors |> View()
-```
 
 
 ### 格式更正
 
-```{r}
+
 dataForAll$municipalityCouncillors |> View()
-```
 
 
-
-```{r}
 View(mayorTable)
 View(councillorTable)
-```
 
 
 # 整理-市長
-```{r}
+
 #行列再次互換
 spread(mayorTable, key = "行政區別", value = "得票數")->mayorTableNew
 #補入嘉義市選舉結果
@@ -281,15 +272,13 @@ mayorTableNew[ , char_columns] <- as.data.frame(apply(mayorTableNew[ , char_colu
 mayorTableNew <- data.frame(mayorTableNew, stringsAsFactors = F)
 #排序縣市
 mayorTableNew[,order(names(mayorTableNew))] -> mayorTableNew
-```
 
-```{r}
+
 View(mayorTableNew)
 str(mayorTableNew)
-```
 
 # 整理-議員
-```{r}
+
 #議員 行列再次互換
 spread(councillorTable, key = "行政區別", value = "席次")->councillorTableNew
 #下行名
@@ -302,25 +291,20 @@ councillorTableNew[ , char_columns2] <- as.data.frame(apply(councillorTableNew[ 
 councillorTableNew <- data.frame(councillorTableNew, stringsAsFactors = F)
 #排序縣市
 councillorTableNew[,order(names(councillorTableNew))] ->councillorTableNew
-```
 
-```{r}
+
+
 View(councillorTableNew)
 str(councillorTableNew)
-```
 
-```{r}
 sapply ( mayorTableNew, max )
 sapply ( councillorTableNew, max )
-```
 
-```{r}
 names(mayorTableNew)
 names(councillorTableNew)
-```
 
 # 合併
-```{r}
+
 summarizedList =list()
 
 #議員
@@ -334,23 +318,16 @@ for(.x in colnames(mayorTableNew)){
     "是否全面執政" = identical(rownames(mayorTableNew[which(targetFeature == max(targetFeature)),]) , rownames(councillorTableNew[which(targetFeature2 == max(targetFeature2)),]))
   )
 }
-```
 
-```{r}
 View(summarizedList)
 #summarizedList <- data.frame(summarizedList)
-```
 
 #二次合併
 
-
-```{r}
 #方法一
 summarizedList2 <- mapply(c, summarizedList$南投縣,summarizedList$嘉義市,summarizedList$嘉義縣,summarizedList$基隆市,summarizedList$宜蘭縣,summarizedList$屏東縣,summarizedList$彰化縣,summarizedList$新北市,summarizedList$新竹市,summarizedList$新竹縣,summarizedList$桃園市,summarizedList$澎湖縣,summarizedList$臺中市,summarizedList$臺北市,summarizedList$臺南市,summarizedList$臺東縣,summarizedList$花蓮縣,summarizedList$苗栗縣,summarizedList$連江縣,summarizedList$金門縣,summarizedList$雲林縣,summarizedList$高雄市 ,SIMPLIFY = F)
 summarizedList2 <- data.frame(summarizedList2)
-```
 
-```{r}
 #方法二
 summarizedList2 <- summarizedList$南投縣
 summarizedList2 <- data.frame(summarizedList2)
@@ -376,7 +353,6 @@ summarizedList2[20,] <- summarizedList$金門縣
 summarizedList2[21,] <- summarizedList$雲林縣
 summarizedList2[22,] <- summarizedList$高雄市
 rownames(summarizedList2) <- colnames(mayorTableNew)
-```
 
 
 
